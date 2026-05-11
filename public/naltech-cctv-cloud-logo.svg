@@ -1,0 +1,16 @@
+<svg width="190" height="56" viewBox="0 0 190 56" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Naltech CCTV Cloud</title>
+  <desc id="desc">Logo Naltech CCTV Cloud dengan simbol kamera, huruf N, dan sinyal cloud.</desc>
+  <rect width="190" height="56" rx="12" fill="white"/>
+  <g transform="translate(8 8)">
+    <rect x="0" y="0" width="40" height="40" rx="10" fill="#02569B"/>
+    <path d="M9 27V13h5.1l11.8 14H31V13h-5v8.4L14.2 13H9v14Z" fill="white"/>
+    <path d="M26.5 9.5h5.7c1 0 1.8.8 1.8 1.8V17h-5.7c-1 0-1.8-.8-1.8-1.8V9.5Z" fill="#19A7CE"/>
+    <circle cx="31" cy="13" r="2.4" fill="white"/>
+    <path d="M10 32c4.2 3.3 15.8 3.3 20 0" stroke="#A9DFFF" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(60 11)">
+    <text x="0" y="16" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="800" fill="#0A1826">Naltech</text>
+    <text x="0" y="35" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="800" fill="#02569B">CCTV Cloud</text>
+  </g>
+</svg>
