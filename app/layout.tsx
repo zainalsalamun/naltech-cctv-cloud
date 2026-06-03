@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Naltech CCTV Cloud",
-  description: "Demo platform cloud recording CCTV untuk investor."
+  description: "Platform cloud recording CCTV untuk bisnis, rumah, dan operasional pelanggan."
 };
 
 export default function RootLayout({
