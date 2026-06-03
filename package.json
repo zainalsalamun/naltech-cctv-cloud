@@ -6,10 +6,19 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "node --env-file=.env prisma/seed.mjs",
+    "db:studio": "prisma studio",
+    "db:validate": "prisma validate"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "next": "^16.2.6",
+    "pg": "^8.21.0",
+    "prisma": "^7.8.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
