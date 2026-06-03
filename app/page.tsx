@@ -1,45 +1,37 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import { createLead } from "@/lib/api";
+import { calculateMonthlyAmount, formatRupiah, packageRates } from "@/lib/pricing";
+import type { CloudPackage } from "@/types/operational";
 
 const whatsappNumber = "6281573550017";
-
-const packageRates = {
-  Basic: 45000,
-  Standard: 65000,
-  Pro: 110000
-};
-
-const formatRupiah = (value: number) =>
-  new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0
-  }).format(value);
 
 const buildWaLink = (message: string) =>
   `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
 export default function HomePage() {
   const [cameraCount, setCameraCount] = useState("4");
-  const [selectedPackage, setSelectedPackage] = useState<keyof typeof packageRates>("Standard");
+  const [selectedPackage, setSelectedPackage] = useState<CloudPackage>("Standard");
   const [note, setNote] = useState("Nomor WhatsApp tujuan sudah terhubung ke Naltech CCTV Cloud.");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const numericCameraCount = Math.max(1, Number.parseInt(cameraCount || "1", 10) || 1);
   const estimateValue = useMemo(
-    () => numericCameraCount * packageRates[selectedPackage],
+    () => calculateMonthlyAmount(numericCameraCount, selectedPackage),
     [numericCameraCount, selectedPackage]
   );
 
   const estimateMessage = `Halo Naltech, saya ingin survey Cloud CCTV. Estimasi awal: ${numericCameraCount} kamera paket ${selectedPackage}, sekitar ${formatRupiah(estimateValue)} per bulan.`;
 
-  function handlePackageClick(packageName: keyof typeof packageRates) {
+  function handlePackageClick(packageName: CloudPackage) {
     setSelectedPackage(packageName);
     setNote(`Paket ${packageName} dipilih. Silakan isi form agar pesan WhatsApp dibuat otomatis.`);
   }
 
-  function handleLeadSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleLeadSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setIsSubmitting(true);
     const data = new FormData(event.currentTarget);
     const name = String(data.get("name") || "");
     const phone = String(data.get("phone") || "");
@@ -52,11 +44,29 @@ export default function HomePage() {
       `WhatsApp: ${phone}`,
       `Jenis lokasi: ${segment}`,
       `Jumlah kamera: ${cameras}`,
+      `Paket minat: ${selectedPackage}`,
       `Catatan: ${notes}`
     ].join("\n");
 
-    window.open(buildWaLink(message), "_blank", "noopener,noreferrer");
-    setNote("Pesan WhatsApp sudah dibuat. Jika tab baru tidak terbuka, cek pop-up browser.");
+    try {
+      await createLead({
+        name,
+        phone,
+        segment,
+        cameras: Math.max(1, Number.parseInt(cameras || "1", 10) || 1),
+        package: selectedPackage,
+        area: "Yogyakarta",
+        notes
+      });
+      window.open(buildWaLink(message), "_blank", "noopener,noreferrer");
+      setNote("Lead tersimpan di dashboard admin dan pesan WhatsApp sudah dibuat.");
+      event.currentTarget.reset();
+      setCameraCount("4");
+    } catch (error) {
+      setNote(error instanceof Error ? error.message : "Lead belum berhasil tersimpan. Coba lagi sebentar.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -80,7 +90,10 @@ export default function HomePage() {
           <a href="#paket">Paket</a>
           <a href="#kontak">Contact</a>
         </nav>
-        <a className="header-cta" href="#kontak">Minta Survey</a>
+        <div className="header-actions">
+          <a className="header-login" href="/login">Masuk</a>
+          <a className="header-cta" href="#kontak">Minta Survey</a>
+        </div>
       </header>
 
       <a className="floating-cta is-visible" href="#kontak">Minta Survey Cloud CCTV</a>
@@ -128,6 +141,7 @@ export default function HomePage() {
               <a className="primary-button" href="#kontak">Jadwalkan Survey</a>
               <a className="secondary-button" href="#paket">Lihat Paket</a>
             </div>
+            <a className="hero-platform-link" href="/login">Masuk ke platform operasional</a>
             <dl className="hero-metrics" aria-label="Ringkasan layanan">
               <div>
                 <dt>7-30 hari</dt>
@@ -347,7 +361,7 @@ export default function HomePage() {
                 Paket
                 <select
                   value={selectedPackage}
-                  onChange={(event) => setSelectedPackage(event.target.value as keyof typeof packageRates)}
+                  onChange={(event) => setSelectedPackage(event.target.value as CloudPackage)}
                 >
                   <option value="Basic">Basic - 7 hari</option>
                   <option value="Standard">Standard - 14 hari</option>
@@ -380,7 +394,7 @@ export default function HomePage() {
                 ["1", "Survey lokasi", "Cek kamera, NVR, jaringan, dan upload internet."],
                 ["2", "Pilih kamera prioritas", "Kasir, pintu masuk, gudang, parkir, atau area rawan."],
                 ["3", "Aktifkan cloud", "Hubungkan stream kamera ke platform cloud recording."],
-                ["4", "Demo dan lanjut bulanan", "Tunjukkan live view, playback, dan download klip bukti."]
+                ["4", "Aktif dan lanjut bulanan", "Tunjukkan live view, playback, dan download klip bukti."]
               ].map(([number, title, body]) => (
                 <li key={title}>
                   <span>{number}</span>
@@ -536,7 +550,9 @@ export default function HomePage() {
                 Catatan
                 <textarea name="notes" rows={4} placeholder="Contoh: ingin backup kamera kasir dan gudang 14 hari" />
               </label>
-              <button className="primary-button full" type="submit">Buat Pesan WhatsApp</button>
+              <button className="primary-button full" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Menyimpan lead..." : "Buat Pesan WhatsApp"}
+              </button>
               <p className="form-note">{note}</p>
             </form>
           </div>
