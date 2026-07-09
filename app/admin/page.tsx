@@ -114,7 +114,7 @@ export default function AdminPage() {
             </div>
             <span>{allLeads.length} lead</span>
           </div>
-          {errorMessage ? <p className="activationNotice">{errorMessage}</p> : null}
+          {errorMessage ? <p className="activationNotice errorNotice">{errorMessage}</p> : null}
           <div className="tableLike leadTable">
             {isLoading ? (
               <div className="emptyState">
