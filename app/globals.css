@@ -1499,6 +1499,77 @@ textarea {
   gap: 12px;
 }
 
+.loginForm {
+  display: grid;
+  gap: 14px;
+}
+
+.loginForm label {
+  display: grid;
+  gap: 7px;
+}
+
+.loginForm label span {
+  color: #334155;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.loginForm input {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 0 13px;
+}
+
+.loginForm input::placeholder {
+  color: #94a3b8;
+}
+
+.loginForm button:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.loginError {
+  margin: 0;
+  border: 1px solid #fecdd3;
+  border-radius: 12px;
+  background: #fff1f2;
+  color: #be123c;
+  padding: 11px 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.loginCredentials {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.loginCredentials div {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.loginCredentials strong {
+  color: #0f172a;
+  font-size: 13px;
+}
+
+.loginCredentials span {
+  overflow-wrap: anywhere;
+  color: #64748b;
+  font-size: 12px;
+}
+
 .dashboard {
   min-height: 100vh;
   display: grid;
@@ -1706,6 +1777,14 @@ textarea {
   align-items: center;
 }
 
+.dashboardTopActions form {
+  margin: 0;
+}
+
+.dashboardTopActions button {
+  cursor: pointer;
+}
+
 .dashboardHeader {
   display: flex;
   align-items: start;
@@ -1880,7 +1959,7 @@ textarea {
 }
 
 .cameraManagementItem {
-  grid-template-columns: minmax(220px, 1fr) auto auto minmax(130px, 0.45fr);
+  grid-template-columns: minmax(220px, 1fr) auto auto minmax(130px, 0.45fr) auto;
 }
 
 .cameraIdentity {
@@ -1900,9 +1979,184 @@ textarea {
   line-height: 1.25;
 }
 
+.cameraActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cameraActions button {
+  min-height: 34px;
+  border: 1px solid #dbe3ee;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #2563eb;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.cameraActions button:hover {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.cameraActions .dangerButton {
+  color: #be123c;
+}
+
+.cameraActions .dangerButton:hover {
+  border-color: #fecdd3;
+  background: #fff1f2;
+}
+
 .customerTable {
   display: grid;
   gap: 10px;
+}
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: -6px 0 14px;
+}
+
+.filterBar select,
+.filterBar button {
+  min-height: 38px;
+  border: 1px solid #dbe3ee;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #334155;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.filterBar select {
+  min-width: 150px;
+}
+
+.filterBar button {
+  color: #2563eb;
+  cursor: pointer;
+}
+
+.filterBar button:hover {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.userTable {
+  display: grid;
+  gap: 10px;
+}
+
+.userRow {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.2fr) minmax(96px, 0.55fr) minmax(160px, 0.9fr) minmax(96px, 0.5fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 15px 16px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: #f8fafc;
+  transition: 0.18s ease;
+}
+
+.userRow:hover {
+  border-color: #dbeafe;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.userIdentity {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.userIdentity strong {
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.userIdentity span,
+.userRow > span {
+  min-width: 0;
+  color: #64748b;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.roleBadge {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  border-radius: 999px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.role-admin {
+  background: #eef2ff;
+  color: #4f46e5 !important;
+}
+
+.role-sales {
+  background: #ecfdf5;
+  color: #047857 !important;
+}
+
+.role-technician {
+  background: #eff6ff;
+  color: #02569b !important;
+}
+
+.role-customer {
+  background: #fff7ed;
+  color: #c2410c !important;
+}
+
+.userActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.userActions button {
+  min-height: 34px;
+  border: 1px solid #dbe3ee;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #2563eb;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.userActions button:hover {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.userActions .dangerButton {
+  color: #be123c;
+}
+
+.userActions .dangerButton:hover {
+  border-color: #fecdd3;
+  background: #fff1f2;
 }
 
 .emptyState {
@@ -2052,10 +2306,10 @@ textarea {
 
 .billingRow {
   display: grid;
-  grid-template-columns: minmax(220px, 1.35fr) minmax(90px, 0.58fr) minmax(90px, 0.58fr) minmax(130px, 0.76fr) auto minmax(120px, 0.7fr);
-  gap: 12px;
+  grid-template-columns: minmax(180px, 0.85fr) minmax(0, 1.45fr);
+  gap: 14px;
   align-items: center;
-  padding: 15px 16px;
+  padding: 16px;
   border: 1px solid transparent;
   border-radius: 12px;
   background: #f8fafc;
@@ -2070,17 +2324,243 @@ textarea {
 .billingIdentity {
   display: grid;
   gap: 5px;
+  min-width: 0;
 }
 
-.billingIdentity strong,
-.billingRow > strong {
+.billingIdentity strong {
   color: #0f172a;
 }
 
-.billingIdentity span,
-.billingRow > span {
+.billingIdentity span {
   color: #64748b;
   font-size: 14px;
+}
+
+.billingMeta {
+  display: grid;
+  grid-template-columns: minmax(62px, 0.7fr) minmax(66px, 0.7fr) minmax(100px, 1fr) auto;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+}
+
+.billingMeta > span {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.billingMeta > strong {
+  color: #0f172a;
+  white-space: nowrap;
+}
+
+.billingRowFooter {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 0;
+}
+
+.billingRowFooter > span {
+  color: #64748b;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.billingActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.billingActions button,
+.billingActions a {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dbe3ee;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #2563eb;
+  padding: 0 11px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.billingActions button:not(.whatsappButton):first-of-type {
+  min-width: 82px;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.billingActions button:hover:not(:disabled),
+.billingActions a:hover {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.billingActions .whatsappButton {
+  border-color: #a7f3d0;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.billingActions .whatsappButton:hover:not(:disabled) {
+  border-color: #6ee7b7;
+  background: #d1fae5;
+}
+
+.billingActions .whatsappButton:disabled {
+  border-color: #e2e8f0;
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.billingActions .paymentButton {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.paymentSummary {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  padding-top: 10px;
+  border-top: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.paymentSummary strong {
+  margin-left: 4px;
+  color: #0f172a;
+}
+
+.paymentHistory {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.paymentHistory > strong {
+  color: #334155;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.paymentHistoryRow {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(150px, 0.8fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid #eef2f7;
+}
+
+.paymentHistoryRow div {
+  display: grid;
+  gap: 3px;
+}
+
+.paymentHistoryRow div > strong {
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.paymentHistoryRow span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.paymentHistoryRow button {
+  min-height: 32px;
+  border: 0;
+  background: transparent;
+  color: #be123c;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.paymentModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.58);
+}
+
+.paymentModal {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 24px;
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+}
+
+.modalCloseButton {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border: 1px solid #dbe3ee;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #475569;
+  font: inherit;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.paymentBalance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #eff6ff;
+  color: #475569;
+}
+
+.paymentBalance strong {
+  color: #0f172a;
+  font-size: 20px;
+}
+
+.billingActions .dangerButton {
+  color: #be123c;
+}
+
+.billingActions .dangerButton:hover {
+  border-color: #fecdd3;
+  background: #fff1f2;
 }
 
 .billingSummary {
@@ -2373,6 +2853,122 @@ textarea {
   line-height: 1.45;
 }
 
+.errorNotice {
+  border-color: #fecdd3;
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.cameraForm {
+  display: grid;
+  gap: 14px;
+}
+
+.billingForm {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.cameraForm label,
+.billingForm label {
+  display: grid;
+  gap: 7px;
+}
+
+.cameraForm label > span,
+.billingForm label > span {
+  color: #334155;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.cameraForm input,
+.cameraForm select,
+.billingForm input,
+.billingForm select,
+.billingForm textarea {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 0 12px;
+}
+
+.billingForm textarea {
+  min-height: 88px;
+  padding-block: 11px;
+  resize: vertical;
+}
+
+.cameraForm input::placeholder,
+.billingForm input::placeholder {
+  color: #94a3b8;
+}
+
+.billingPreview {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  background: #eff6ff;
+}
+
+.billingPreview span,
+.billingPreview small {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.billingPreview strong {
+  color: #0f172a;
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.cameraFormSplit {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr;
+  gap: 12px;
+}
+
+.cameraToggle {
+  min-height: 44px;
+  display: flex !important;
+  grid-template-columns: none;
+  align-items: center;
+  gap: 10px !important;
+  padding: 0 12px;
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.cameraToggle input {
+  width: 17px;
+  min-height: 17px;
+  accent-color: #2563eb;
+}
+
+.cameraFormActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cameraFormActions .button {
+  flex: 1 1 160px;
+}
+
+.cameraFormActions .button:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
 .fullWidth {
   width: 100%;
 }
@@ -2410,6 +3006,36 @@ textarea {
 
 .customerGrid {
   align-items: start;
+}
+
+.portalCustomerPicker {
+  display: flex;
+  align-items: end;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: -8px 0 18px;
+}
+
+.portalCustomerPicker label {
+  width: min(420px, 100%);
+  display: grid;
+  gap: 7px;
+}
+
+.portalCustomerPicker label span {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.portalCustomerPicker select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 0 12px;
 }
 
 .customerPreviewGrid .cameraPreview {
@@ -2476,6 +3102,11 @@ textarea {
   font-size: 14px;
   font-weight: 750;
   cursor: pointer;
+}
+
+.playbackTimeline button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .playbackTimeline > div {
@@ -2568,20 +3199,88 @@ textarea {
     padding-inline: 18px;
   }
 
+  .dashboardTopbar {
+    margin-inline: -18px;
+    padding-inline: 18px;
+  }
+
   .statGrid,
   .previewGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .portalCustomerPicker {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .portalCustomerPicker label {
+    width: 100%;
+  }
+
+  .loginCredentials {
     grid-template-columns: 1fr;
   }
 
   .tableRow,
   .cameraItem,
   .customerRow,
+  .userRow,
   .billingRow {
     grid-template-columns: 1fr;
   }
 
+  .billingMeta {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .customerActions {
     justify-content: flex-start;
+  }
+
+  .userActions {
+    justify-content: flex-start;
+  }
+
+  .billingRowFooter {
+    grid-column: 1;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .billingActions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .paymentSummary {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .paymentHistoryRow {
+    grid-template-columns: 1fr auto;
+  }
+
+  .paymentHistoryRow > span {
+    grid-column: 1;
+  }
+
+  .paymentHistoryRow button {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+
+  .paymentModalBackdrop {
+    align-items: end;
+    padding: 0;
+  }
+
+  .paymentModal {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 12px 12px 0 0;
+    padding: 20px 18px;
   }
 
   .customerDetailGrid {
@@ -2590,6 +3289,14 @@ textarea {
 
   .playbackTimeline > div {
     grid-template-columns: auto 1fr;
+  }
+
+  .cameraActions {
+    justify-content: flex-start;
+  }
+
+  .cameraFormSplit {
+    grid-template-columns: 1fr;
   }
 
   .playbackTimeline em,
