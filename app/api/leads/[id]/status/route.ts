@@ -1,22 +1,20 @@
-import { NextResponse } from "next/server";
 import { updateLeadStatus } from "@/lib/server/repository";
-import { leadStatusOptions } from "@/lib/operational";
-import type { LeadStatus } from "@/types/operational";
+import { jsonData, jsonError, readJsonBody } from "@/lib/server/api-response";
+import { validateLeadStatusPatch } from "@/lib/server/validation";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const body = await request.json();
-  const status = String(body.status || "") as LeadStatus;
+  const validation = validateLeadStatusPatch(await readJsonBody(request));
 
-  if (!leadStatusOptions.includes(status)) {
-    return NextResponse.json({ message: "Status lead tidak valid." }, { status: 400 });
+  if (!validation.ok) {
+    return jsonError(validation.message, 400, validation.issues);
   }
 
-  const lead = await updateLeadStatus(id, status);
+  const lead = await updateLeadStatus(id, validation.data.status);
 
   if (!lead) {
-    return NextResponse.json({ message: "Lead tidak ditemukan." }, { status: 404 });
+    return jsonError("Lead tidak ditemukan.", 404);
   }
 
-  return NextResponse.json({ data: lead });
+  return jsonData(lead);
 }
