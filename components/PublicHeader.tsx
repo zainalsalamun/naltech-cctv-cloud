@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Brand } from "./Brand";
-import { company } from "@/data/demo";
+import { company } from "@/data/operational";
 
 export function PublicHeader() {
   return (
@@ -16,7 +16,7 @@ export function PublicHeader() {
           <Link href="#services">Services</Link>
           <Link href="#packages">Paket</Link>
           <Link href="#why">Kenapa Naltech</Link>
-          <Link href="/login">Login Demo</Link>
+          <Link href="/login">Login</Link>
         </nav>
         <Link className="button buttonPrimary" href={`https://wa.me/${company.phoneWa}`}>
           Minta Survey
