@@ -3,23 +3,34 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { DashboardShell } from "@/components/DashboardShell";
-import { cameras } from "@/data/operational";
-import { getCustomers, getLeads } from "@/lib/api";
+import { getCameras, getCustomers, getLeads } from "@/lib/api";
 import { calculateMonthlyAmount, formatRupiah } from "@/lib/pricing";
-import { customerStatus, slugify } from "@/lib/operational";
-import type { LeadWithId } from "@/types/operational";
+import { customerStatus } from "@/lib/operational";
+import type { LeadWithId, ManagedCamera } from "@/types/operational";
+
+const packageOptions = ["Semua paket", "Basic", "Standard", "Pro"];
+const statusOptions = ["Semua status", "Aktif", "Survey", "Prospek"];
+
+function normalize(value: string) {
+  return value.toLowerCase().trim();
+}
 
 export default function CustomerManagementPage() {
   const [allLeads, setAllLeads] = useState<LeadWithId[]>([]);
   const [activeLeads, setActiveLeads] = useState<LeadWithId[]>([]);
+  const [managedCameras, setManagedCameras] = useState<ManagedCamera[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [packageFilter, setPackageFilter] = useState("Semua paket");
+  const [statusFilter, setStatusFilter] = useState("Semua status");
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    Promise.all([getLeads(), getCustomers()])
-      .then(([leads, customers]) => {
+    Promise.all([getLeads(), getCustomers(), getCameras()])
+      .then(([leads, customers, cloudCameras]) => {
         setAllLeads(leads);
         setActiveLeads(customers);
+        setManagedCameras(cloudCameras);
         setErrorMessage("");
       })
       .catch((error) => {
@@ -31,12 +42,11 @@ export default function CustomerManagementPage() {
   const customers = useMemo(
     () =>
       activeLeads.map((lead) => {
-        const customerCameras = cameras.filter((camera) => camera.location === lead.name);
+        const customerCameras = managedCameras.filter((camera) => camera.customerId === lead.id);
         const cameraCount = customerCameras.length || lead.cameras;
 
         return {
-          id: slugify(lead.name),
-          isSeedData: lead.id.startsWith("seed-"),
+          id: lead.id,
           name: lead.name,
           segment: lead.segment,
           area: lead.area,
@@ -47,10 +57,31 @@ export default function CustomerManagementPage() {
           billing: formatRupiah(calculateMonthlyAmount(cameraCount, lead.package))
         };
       }),
-    [activeLeads]
+    [activeLeads, managedCameras]
   );
 
   const activeCustomers = customers.filter((customer) => customer.status === "Aktif");
+  const filteredCustomers = useMemo(() => {
+    const query = normalize(searchQuery);
+
+    return customers.filter((customer) => {
+      const matchesSearch =
+        !query ||
+        normalize(`${customer.name} ${customer.segment} ${customer.area} ${customer.package}`).includes(query);
+      const matchesPackage = packageFilter === "Semua paket" || customer.package === packageFilter;
+      const matchesStatus = statusFilter === "Semua status" || customer.status === statusFilter;
+
+      return matchesSearch && matchesPackage && matchesStatus;
+    });
+  }, [customers, packageFilter, searchQuery, statusFilter]);
+  const filteredCameraList = useMemo(() => {
+    const query = normalize(searchQuery);
+    if (!query) return managedCameras;
+
+    return managedCameras.filter((camera) =>
+      normalize(`${camera.name} ${camera.customerName} ${camera.location} ${camera.status} ${camera.retention}`).includes(query)
+    );
+  }, [managedCameras, searchQuery]);
   const totalCameras = customers.reduce((sum, customer) => sum + customer.cameras, 0);
   const pipelineCount = Math.max(0, allLeads.length - customers.length);
   const mrrTotal = customers.reduce((sum, customer) => sum + calculateMonthlyAmount(customer.cameras, customer.package), 0);
@@ -60,6 +91,9 @@ export default function CustomerManagementPage() {
       mode="admin"
       title="Kelola Pelanggan"
       subtitle="Pantau pelanggan cloud CCTV, paket aktif, status kamera, dan tagihan bulanan."
+      searchValue={searchQuery}
+      searchPlaceholder="Cari nama, area, paket, atau kamera..."
+      onSearchChange={setSearchQuery}
     >
       <section className="statGrid">
         <article className="metricCard">
@@ -103,16 +137,35 @@ export default function CustomerManagementPage() {
               <h2>Daftar pelanggan</h2>
               <p>Lead yang diaktifkan dari dashboard admin akan muncul sebagai pelanggan aktif.</p>
             </div>
-            <span>{customers.length} aktif</span>
+            <span>{filteredCustomers.length} tampil</span>
           </div>
-          {errorMessage ? <p className="activationNotice">{errorMessage}</p> : null}
+          <div className="filterBar">
+            <select value={packageFilter} onChange={(event) => setPackageFilter(event.target.value)}>
+              {packageOptions.map((option) => (
+                <option value={option} key={option}>{option}</option>
+              ))}
+            </select>
+            <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+              {statusOptions.map((option) => (
+                <option value={option} key={option}>{option}</option>
+              ))}
+            </select>
+            <button type="button" onClick={() => {
+              setSearchQuery("");
+              setPackageFilter("Semua paket");
+              setStatusFilter("Semua status");
+            }}>
+              Reset filter
+            </button>
+          </div>
+          {errorMessage ? <p className="activationNotice errorNotice">{errorMessage}</p> : null}
           <div className="customerTable">
             {isLoading ? (
               <div className="emptyState">
                 <strong>Memuat pelanggan...</strong>
                 <span>Data sedang diambil dari API internal.</span>
               </div>
-            ) : customers.length > 0 ? customers.map((customer) => (
+            ) : filteredCustomers.length > 0 ? filteredCustomers.map((customer) => (
               <div className="customerRow" key={`${customer.id}-${customer.name}`}>
                 <div className="customerIdentity">
                   <strong>{customer.name}</strong>
@@ -125,14 +178,14 @@ export default function CustomerManagementPage() {
                 </span>
                 <strong>{customer.billing}</strong>
                 <div className="customerActions">
-                  <Link href={customer.isSeedData ? `/customer/${customer.id}` : "/customer"}>Detail</Link>
-                  <Link href="/customer-portal">Portal</Link>
+                  <Link href={`/customer/${customer.id}`}>Detail</Link>
+                  <Link href={`/customer-portal?customerId=${customer.id}`}>Portal</Link>
                 </div>
               </div>
             )) : (
               <div className="emptyState">
-                <strong>Belum ada pelanggan aktif</strong>
-                <span>Ubah status lead menjadi Pilot aktif dari dashboard admin.</span>
+                <strong>{customers.length ? "Pelanggan tidak ditemukan" : "Belum ada pelanggan aktif"}</strong>
+                <span>{customers.length ? "Coba ubah kata kunci atau reset filter." : "Ubah status lead menjadi Pilot aktif dari dashboard admin."}</span>
               </div>
             )}
           </div>
@@ -171,21 +224,26 @@ export default function CustomerManagementPage() {
               <h2>Kamera per pelanggan</h2>
               <p>Monitoring singkat kamera cloud berdasarkan lokasi pelanggan.</p>
             </div>
-            <span>{cameras.length} kamera</span>
+            <span>{filteredCameraList.length} kamera</span>
           </div>
           <div className="cameraList">
-            {cameras.map((camera) => (
-              <div className="cameraItem" key={`${camera.location}-${camera.name}`}>
+            {filteredCameraList.length > 0 ? filteredCameraList.map((camera) => (
+              <div className="cameraItem" key={camera.id}>
                 <div className="cameraIdentity">
                   <strong>{camera.name}</strong>
-                  <span>{camera.location}</span>
+                  <span>{camera.customerName}</span>
                 </div>
                 <span className={camera.status === "Online" ? "pill success" : "pill danger"}>
                   {camera.status}
                 </span>
                 <span>{camera.retention}</span>
               </div>
-            ))}
+            )) : (
+              <div className="emptyState">
+                <strong>{managedCameras.length ? "Kamera tidak ditemukan" : "Belum ada kamera cloud"}</strong>
+                <span>{managedCameras.length ? "Coba kata kunci lain di search atas." : "Kamera akan muncul setelah ditambahkan ke pelanggan."}</span>
+              </div>
+            )}
           </div>
         </article>
       </section>
