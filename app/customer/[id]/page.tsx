@@ -1,28 +1,29 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { DashboardShell } from "@/components/DashboardShell";
-import { cameras, leads } from "@/data/operational";
-import { calculateMonthlyAmount, formatRupiah } from "@/lib/pricing";
-import { slugify } from "@/lib/operational";
+import { getCustomerDetail } from "@/lib/server/repository";
+import { formatRupiah } from "@/lib/pricing";
 
-export default function CustomerDetailPage({ params }: { params: { id: string } }) {
-  const lead = leads.find((item) => slugify(item.name) === params.id) || leads[0];
-  const customerCameras = cameras.filter((camera) => camera.location === lead.name);
-  const cameraCount = customerCameras.length || lead.cameras;
-  const monthly = calculateMonthlyAmount(cameraCount, lead.package);
-  const online = customerCameras.filter((camera) => camera.status === "Online").length;
+export default async function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const customer = await getCustomerDetail(id);
+
+  if (!customer) {
+    notFound();
+  }
 
   return (
     <DashboardShell
       mode="admin"
-      title={lead.name}
-      subtitle={`Detail pelanggan ${lead.segment} di ${lead.area}. Paket ${lead.package}, ${cameraCount} kamera cloud.`}
+      title={customer.name}
+      subtitle={`Detail pelanggan ${customer.segment} di ${customer.area}. Paket ${customer.package}, ${customer.cameraCount} kamera cloud.`}
     >
       <section className="statGrid">
         <article className="metricCard">
           <div className="metricIcon accent-1">PK</div>
           <div>
             <span>Paket</span>
-            <strong>{lead.package}</strong>
+            <strong>{customer.package}</strong>
             <small>Retensi mengikuti paket</small>
           </div>
         </article>
@@ -30,8 +31,8 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
           <div className="metricIcon accent-2">CM</div>
           <div>
             <span>Kamera</span>
-            <strong>{cameraCount}</strong>
-            <small>{online} kamera online</small>
+            <strong>{customer.cameraCount}</strong>
+            <small>{customer.onlineCameras} kamera online</small>
           </div>
         </article>
         <article className="metricCard">
@@ -46,8 +47,8 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
           <div className="metricIcon accent-4">BL</div>
           <div>
             <span>Tagihan</span>
-            <strong>{formatRupiah(monthly)}</strong>
-            <small>Estimasi bulanan</small>
+            <strong>{formatRupiah(customer.monthlyAmount)}</strong>
+            <small>{customer.latestInvoice?.status || "Estimasi bulanan"}</small>
           </div>
         </article>
       </section>
@@ -59,24 +60,24 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
               <h2>Profil pelanggan</h2>
               <p>Informasi singkat untuk operasional dan follow-up customer success.</p>
             </div>
-            <span>{lead.status}</span>
+            <span>{customer.status}</span>
           </div>
           <div className="customerDetailGrid">
             <div>
               <span>Nama pelanggan</span>
-              <strong>{lead.name}</strong>
+              <strong>{customer.name}</strong>
             </div>
             <div>
               <span>Jenis lokasi</span>
-              <strong>{lead.segment}</strong>
+              <strong>{customer.segment}</strong>
             </div>
             <div>
               <span>Area</span>
-              <strong>{lead.area}</strong>
+              <strong>{customer.area}</strong>
             </div>
             <div>
               <span>Paket cloud</span>
-              <strong>{lead.package}</strong>
+              <strong>{customer.package}</strong>
             </div>
           </div>
         </article>
@@ -90,7 +91,7 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
             <span>Aksi</span>
           </div>
           <div className="customerActionStack">
-            <Link className="button buttonPrimary fullWidth" href="/customer-portal">
+            <Link className="button buttonPrimary fullWidth" href={`/customer-portal?customerId=${customer.id}`}>
               Lihat Portal Customer
             </Link>
             <Link className="button buttonGhost fullWidth" href="/customer">
@@ -105,10 +106,10 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
               <h2>Kamera pelanggan</h2>
               <p>Status kamera cloud untuk lokasi ini.</p>
             </div>
-            <span>{cameraCount} kamera</span>
+            <span>{customer.cameraCount} kamera</span>
           </div>
           <div className="cameraList">
-            {(customerCameras.length ? customerCameras : cameras.slice(0, cameraCount)).map((camera) => (
+            {customer.cameras.length > 0 ? customer.cameras.map((camera) => (
               <div className="cameraItem" key={`${camera.location}-${camera.name}`}>
                 <div className="cameraIdentity">
                   <strong>{camera.name}</strong>
@@ -119,7 +120,12 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
                 </span>
                 <span>{camera.retention}</span>
               </div>
-            ))}
+            )) : (
+              <div className="emptyState">
+                <strong>Belum ada kamera</strong>
+                <span>Kamera pelanggan akan muncul setelah ditambahkan.</span>
+              </div>
+            )}
           </div>
         </article>
       </section>
