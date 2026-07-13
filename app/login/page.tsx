@@ -1,7 +1,17 @@
-import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Brand } from "@/components/Brand";
+import { LoginForm } from "./LoginForm";
+import { getSession } from "@/lib/server/session";
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const session = await getSession();
+
+  if (session) {
+    redirect(session.role === "customer"
+      ? `/customer-portal?customerId=${encodeURIComponent(session.customerId || "")}`
+      : "/admin");
+  }
+
   return (
     <main className="loginPage">
       <section className="loginCard">
@@ -9,15 +19,18 @@ export default function LoginPage() {
         <div>
           <p className="eyebrow">Akses platform</p>
           <h1>Masuk ke dashboard Naltech</h1>
-          <p>Pilih area kerja sesuai kebutuhan operasional.</p>
+          <p>Gunakan akun admin atau customer yang sudah terdaftar.</p>
         </div>
-        <div className="loginActions">
-          <Link className="button buttonPrimary" href="/admin">
-            Masuk sebagai Admin
-          </Link>
-          <Link className="button buttonGhost" href="/customer-portal">
-            Masuk sebagai Pelanggan
-          </Link>
+        <LoginForm />
+        <div className="loginCredentials">
+          <div>
+            <strong>Admin lokal</strong>
+            <span>admin@naltech.id</span>
+          </div>
+          <div>
+            <strong>Customer lokal</strong>
+            <span>customer@naltech.id</span>
+          </div>
         </div>
       </section>
     </main>
