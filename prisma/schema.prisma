@@ -1,0 +1,186 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  admin
+  sales
+  technician
+  customer
+}
+
+enum PackageName {
+  Basic
+  Standard
+  Pro
+}
+
+enum LeadStatus {
+  Baru
+  MenungguFollowUp
+  FollowUp
+  SurveyDijadwalkan
+  PilotAktif
+  TidakLanjut
+}
+
+enum CustomerStatus {
+  onboarding
+  active
+  paused
+  cancelled
+}
+
+enum CameraStatus {
+  online
+  offline
+  maintenance
+}
+
+enum InvoiceStatus {
+  draft
+  unpaid
+  paid
+  overdue
+  cancelled
+}
+
+enum PaymentMethod {
+  bank_transfer
+  cash
+  e_wallet
+  other
+}
+
+model User {
+  id           String     @id @default(uuid())
+  name         String
+  email        String     @unique
+  passwordHash String
+  role         UserRole
+  customerId   String?    @unique
+  customer     Customer?  @relation("CustomerPortalUser", fields: [customerId], references: [id])
+  leads        Lead[]     @relation("LeadAssignee")
+  customers    Customer[] @relation("CustomerManager")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([customerId])
+}
+
+model Lead {
+  id           String      @id @default(uuid())
+  name         String
+  phone        String?
+  segment      String
+  camerasCount Int
+  packageName  PackageName
+  status       LeadStatus  @default(Baru)
+  area         String
+  notes        String?
+  assignedToId String?
+  assignedTo   User?       @relation("LeadAssignee", fields: [assignedToId], references: [id])
+  customer     Customer?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([assignedToId])
+}
+
+model Customer {
+  id          String         @id @default(uuid())
+  leadId      String?        @unique
+  lead        Lead?          @relation(fields: [leadId], references: [id])
+  name        String
+  phone       String?
+  segment     String
+  packageName PackageName
+  status      CustomerStatus @default(onboarding)
+  area        String
+  managedById String?
+  managedBy   User?          @relation("CustomerManager", fields: [managedById], references: [id])
+  portalUser  User?          @relation("CustomerPortalUser")
+  cameras     Camera[]
+  invoices    Invoice[]
+  activatedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([status])
+  @@index([managedById])
+}
+
+model Camera {
+  id                    String       @id @default(uuid())
+  customerId            String
+  customer              Customer     @relation(fields: [customerId], references: [id])
+  name                  String
+  location              String
+  streamUrl             String?
+  status                CameraStatus @default(offline)
+  retentionDays         Int
+  cloudRecordingEnabled Boolean      @default(true)
+  lastOnlineAt          DateTime?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+}
+
+model Invoice {
+  id            String        @id @default(uuid())
+  customerId    String
+  customer      Customer      @relation(fields: [customerId], references: [id])
+  invoiceNumber String        @unique
+  status        InvoiceStatus @default(draft)
+  subtotal      Int
+  total         Int
+  issuedDate    DateTime
+  dueDate       DateTime
+  paidAt        DateTime?
+  items         InvoiceItem[]
+  payments      Payment[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+model Payment {
+  id        String        @id @default(uuid())
+  invoiceId String
+  invoice   Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  amount    Int
+  method    PaymentMethod
+  reference String?
+  notes     String?
+  paidAt    DateTime
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([invoiceId])
+  @@index([paidAt])
+}
+
+model InvoiceItem {
+  id          String   @id @default(uuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id])
+  description String
+  quantity    Int
+  unitPrice   Int
+  total       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([invoiceId])
+}
